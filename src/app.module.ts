@@ -3,9 +3,14 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { HealthModule } from './health/health.module';
 import { LogsModule } from './logs/logs.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [HealthModule, LogsModule],
+  imports: [
+    ConfigModule.forRoot(), // Load environment variables from .env file
+    HealthModule,
+    LogsModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
