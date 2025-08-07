@@ -6,13 +6,18 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { LogsService } from './logs.service';
 
 /**
- * TODO: Future enhancements could include:
+ * TODO:
+ * ------
  * - Whitelist of allowed file types can be implemented here
+ * - Use stream processing for large files
+ * - Send files to s3
  */
 @Controller('logs')
 export class LogsController {
+  constructor(private readonly LogsService: LogsService) {}
   @Post()
   @UseInterceptors(
     FileInterceptor('file', {
@@ -30,12 +35,15 @@ export class LogsController {
       );
     }
 
-    return {
-      message: 'Logs uploaded successfully',
-      file: file.originalname,
+    const content = file.buffer.toString();
+    const metadata = {
+      originalName: file.originalname,
       size: file.size,
-      mime: file.mimetype,
-      content: file.buffer.toString(),
+      mimeType: file.mimetype,
     };
+    if (!content) {
+      throw new BadRequestException('File is empty.');
+    }
+    return this.LogsService.processLogFile(content, metadata);
   }
 }
