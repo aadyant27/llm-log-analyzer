@@ -1,13 +1,5 @@
 import { Injectable } from '@nestjs/common';
-
-/**
- * TODO:
- * ------
- * - Add types
- * - Lint rules, pre-commit hooks so any type errors are caught early
- * - Logger service for better logging
- *
- */
+import { LogsSummarizer } from './logic/logs-summarize.service';
 
 export interface ParsedLog {
   requestId: string;
@@ -25,7 +17,8 @@ export interface ChunkedLogs {
 }
 @Injectable()
 export class LogsService {
-  processLogFile(rawContent: string, metadata: any) {
+  constructor(private readonly summarizer: LogsSummarizer) {}
+  async processLogFile(rawContent: string, metadata: any) {
     // Split the raw content into lines
     const content = rawContent.split('\n');
     const parsedLogs: ParsedLog[] = [];
@@ -49,16 +42,24 @@ export class LogsService {
     });
 
     const { Keys, chunkLogs } = this.chunkLogs(parsedLogs);
+    const errorChunk = chunkLogs.filter((c) => c.level === 'error');
+    if (errorChunk.length === 0) {
+      return {
+        summary: 'No Errors found!',
+      };
+    }
+    const summary = await this.summarizer.summarizeLogs(errorChunk);
     return {
-      Keys,
-      chunkLogs,
-      size: chunkLogs.length,
-      metadata,
-      Orignalsize: parsedLogs.length,
+      summary,
+      // errorChunk,
+      // chunkLogs,
+      // size: chunkLogs.length,
+      // metadata,
+      // Orignalsize: parsedLogs.length,
     };
   }
 
-  // Group related log entries into semantic chunks so that each chunk represents a meaningful unit(like a request lifecycle or a user session)
+  // Group related log entries into semantic chunks so that each chunk represents a meaningful unit
   private chunkLogs(parsedLogs: ParsedLog[]) {
     const chunkLogs = new Map<string, ChunkedLogs>();
     let currentRequestId: string | null = null;

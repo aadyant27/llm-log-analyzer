@@ -1,3 +1,26 @@
+# TODOs
+
+### General Issues:
+
+- Add types, remove 'any' type
+- Add eslint checks/tests to the pipeline
+- Logger service for better logging
+
+### logs.service.ts
+
+- Whitelist of allowed file types can be implemented here
+- Use stream processing for large files
+- Send files to s3
+
+### logs-summarize.service.ts
+
+- Use design patterns for better scalability of LLM integration
+- Design pattern to allow for easy integration with any of the LLM APIs
+
+### logs.service.ts
+
+-
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
 </p>
