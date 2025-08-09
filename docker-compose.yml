@@ -1,0 +1,23 @@
+version: '3.8'
+services:
+  llm-app:
+    container_name: llm-RAG
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # target: builder   # optional: if you used multi-stage and want a specific stage
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '3000:3000'
+    command: npm run start:dev
+    volumes:
+      - ./:/app # Mount project into container so watcher sees changes
+      - /app/node_modules # keep container's node_modules (prevents host overwrite)
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -f http://localhost:3000/health || exit 1']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

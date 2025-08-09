@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ChunkedLogs } from '../logs.service';
 import OpenAI from 'openai';
+import { estimateLLMCost } from '../utils/llm-cost-estimator';
 
 @Injectable()
 export class LogsSummarizer {
@@ -85,7 +86,12 @@ export class LogsSummarizer {
       model: 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: prompt }],
     });
-    console.log('✅ OpenAI response:', response);
+    // console.log('✅ OpenAI response:', response);
+    estimateLLMCost(
+      response.model,
+      response.usage.prompt_tokens,
+      response.usage.completion_tokens,
+    );
 
     return response.choices[0].message.content || 'No summary generated';
   }
