@@ -2,11 +2,14 @@
 
 ### General Issues:
 
+- ~~Integrate Docker~~
 - Add types, remove 'any' type
 - Add eslint checks/tests to the pipeline
-- Logger service for better logging
+- Logger service for better logging(Use messagingQueue like RabbitMQ/Kafka to send & store the logs)
+- Add TESTs
+- Add Monitoring of API, using prometheus, Loki, Grafana, etc
 
-### logs.service.ts
+### logs.controller.ts
 
 - Whitelist of allowed file types can be implemented here
 - Use stream processing for large files
@@ -14,12 +17,19 @@
 
 ### logs-summarize.service.ts
 
-- Use design patterns for better scalability of LLM integration
+- Use DESIGN PATTERNS for better scalability of LLM integration
 - Design pattern to allow for easy integration with any of the LLM APIs
 
 ### logs.service.ts
 
--
+- Break the service file into components, and place all these components in the /logic folder.
+- Only function calls should be made in logs.service.ts to increase readability and manageability.
+
+## DOCS
+
+- Add docs to generate openAI API key
+- Steps to run docker
+- Steps to create .env file
 
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
@@ -80,17 +90,3 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
