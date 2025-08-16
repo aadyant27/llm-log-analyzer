@@ -35,7 +35,7 @@ export class LangchainPineconeService {
     }
   }
 
-  async search(query: string, topK = 1) {
+  async search(query: string, topK = 1): Promise<VectorDocument[]> {
     const index = this.pineconeService.getIndex();
 
     // Creating instance of pinecone index(table) where we want to store our embeddings

@@ -3,6 +3,8 @@ import { LogsSummarizer } from './logic/logs-summarize.service';
 import { ChunkedLogs, ParsedLog, LogsSummary } from './types/logs.interface';
 import { LangchainPineconeService } from 'src/shared/pinecone';
 import { LogsPineconeMapper } from './logic/logs-pinecone.mapper';
+import { Vector } from '@pinecone-database/pinecone/dist/pinecone-generated-ts-fetch/db_data';
+import { VectorDocument } from 'src/shared/pinecone/types/pinecone.interface';
 
 /**
  * TODO:
@@ -103,5 +105,10 @@ export class LogsService {
       Keys: Array.from(chunkLogs.keys()),
       chunkLogs: Array.from(chunkLogs.values()),
     };
+  }
+
+  // ///////////////////////////////////
+  async getAugmentedGeneration(logs: VectorDocument[]) {
+    return this.summarizer.buildPromptForAugmentedGeneration(logs);
   }
 }
