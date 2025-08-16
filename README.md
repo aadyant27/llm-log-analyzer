@@ -1,13 +1,33 @@
+# Features
+
+- If same file is uploaded again, then the embedding for that file is skipped, instead of just upserting it.
+
 # TODOs
+
+### **URGENT**
+
+- Avoid embedding duplicates
+- streaming
+- RabbitMQ/Kafka
+- Add cost analysis of embedding
+- MAP REDUCE for large logs
 
 ### General Issues:
 
 - ~~Integrate Docker~~
+- Add try-catch, error-stack
+- Segregate dtos/interface files into separate folders
 - Add types, remove 'any' type
 - Add eslint checks/tests to the pipeline
 - Logger service for better logging(Use messagingQueue like RabbitMQ/Kafka to send & store the logs)
 - Add TESTs
 - Add Monitoring of API, using prometheus, Loki, Grafana, etc
+- Batching, concurrency, and rate limits
+- Add authorization mechanism
+
+### langchain-pinecone.service.ts
+
+- Batch documents before fetch/upsert to avoid hitting request size limits
 
 ### logs.controller.ts
 

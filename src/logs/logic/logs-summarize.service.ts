@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { ChunkedLogs } from '../logs.service';
 import OpenAI from 'openai';
 import { estimateLLMCost } from '../utils/llm-cost-estimator';
+import { ChunkedLogs } from '../types/logs.interface';
 
 @Injectable()
 export class LogsSummarizer {
