@@ -60,9 +60,17 @@ export class LogsController {
     const res = await this.langchainPinecone.search(
       'cash-facility-advanced-overdraft-contracts?offset=100&limit=200',
     );
-
+    const final = await this.LogsService.getAugmentedGeneration(res);
+    let parsedSummary: any;
+    try {
+      parsedSummary = JSON.parse(final);
+    } catch (err) {
+      // fallback: return raw string if parsing fails
+      parsedSummary = { raw: final };
+    }
     return {
       message: res,
+      generateSummary: parsedSummary,
     };
   }
 }
