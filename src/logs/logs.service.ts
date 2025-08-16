@@ -1,24 +1,57 @@
 import { Injectable } from '@nestjs/common';
 import { LogsSummarizer } from './logic/logs-summarize.service';
+import { ChunkedLogs, ParsedLog, LogsSummary } from './types/logs.interface';
+import { LangchainPineconeService } from 'src/shared/pinecone';
+import { LogsPineconeMapper } from './logic/logs-pinecone.mapper';
 
-export interface ParsedLog {
-  requestId: string;
-  timestamp: string;
-  level: string; // 'INFO', 'WARN', 'ERROR', etc
-  pingcode: string;
-  message: string;
-  raw: string; // the original line
-}
-
-export interface ChunkedLogs {
-  requestId: string;
-  level: string; // Make it enum
-  entries: ParsedLog[];
-}
+/**
+ * TODO:
+ * Only public methods attached to the controller should be here.
+ * Rest of the methods should be in /logic.
+ * */
 @Injectable()
 export class LogsService {
-  constructor(private readonly summarizer: LogsSummarizer) {}
-  async processLogFile(rawContent: string, metadata: any) {
+  constructor(
+    private readonly summarizer: LogsSummarizer,
+    private langchainPinecone: LangchainPineconeService,
+    private logsMapper: LogsPineconeMapper,
+  ) {}
+  async handler(rawContent: string, summarize: boolean) {
+    // Process the raw content and return the summary
+    // return await this.processLogFile(rawContent);
+
+    const errorChunks = await this.processLogFile(rawContent);
+    if (errorChunks.length === 0) {
+      return {
+        message: 'No errors found in the logs.',
+        generateImmediateSummary: summarize,
+        summary: [],
+      };
+    }
+
+    let summary: LogsSummary[] = [];
+    if (summarize) {
+      summary = await this.summarizer.summarizeLogs(errorChunks);
+    }
+
+    // console.log('🔥 ERROR CHUNKS', errorChunks);
+
+    this.generateVectorEmbeddings(errorChunks);
+    return {
+      message: 'Embeddings created successfully.',
+      generateImmediateSummary: summarize,
+      summary: summary,
+    };
+  }
+
+  async generateVectorEmbeddings(errorChunks: ChunkedLogs[]) {
+    const docs = this.logsMapper.toVectorDocuments(errorChunks);
+    console.log('🔥 Vector Documents', docs);
+    // await this.langchainPinecone.addDocuments(docs);
+    // console.log(`✅ Added ${docs.length} docs to Pinecone`);
+  }
+
+  async processLogFile(rawContent: string) {
     // Split the raw content into lines
     const content = rawContent.split('\n');
     const parsedLogs: ParsedLog[] = [];
@@ -41,22 +74,9 @@ export class LogsService {
       });
     });
 
-    const { Keys, chunkLogs } = this.chunkLogs(parsedLogs);
-    const errorChunk = chunkLogs.filter((c) => c.level === 'error');
-    if (errorChunk.length === 0) {
-      return {
-        summary: 'No Errors found!',
-      };
-    }
-    const summary = await this.summarizer.summarizeLogs(errorChunk);
-    return {
-      summary,
-      // errorChunk,
-      // chunkLogs,
-      // size: chunkLogs.length,
-      // metadata,
-      // Orignalsize: parsedLogs.length,
-    };
+    const { chunkLogs } = this.chunkLogs(parsedLogs);
+    const errorChunks = chunkLogs.filter((c) => c.level === 'error');
+    return errorChunks;
   }
 
   // Group related log entries into semantic chunks so that each chunk represents a meaningful unit
