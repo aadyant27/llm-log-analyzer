@@ -6,11 +6,14 @@
 
 ### **URGENT**
 
-- Avoid embedding duplicates
-- streaming
+- Add validation of query string in POST API
+- ~~ Add Monitoring ~~
+- Add log collection
+- Streaming
 - RabbitMQ/Kafka
 - Add cost analysis of embedding
 - MAP REDUCE for large logs
+- Avoid embedding duplicates
 
 ### General Issues:
 
@@ -19,7 +22,7 @@
 - Segregate dtos/interface files into separate folders
 - Add types, remove 'any' type
 - Add eslint checks/tests to the pipeline
-- Logger service for better logging(Use messagingQueue like RabbitMQ/Kafka to send & store the logs)
+- Logger service for better logging(Use messagingQueue like RabbitMQ/Kafka to send & store the logs) and then **LOG COLLECTION MONITORING**
 - Add TESTs
 - Add Monitoring of API, using prometheus, Loki, Grafana, etc
 - Batching, concurrency, and rate limits
