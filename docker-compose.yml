@@ -21,3 +21,25 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    ports:
+      - '9090:9090'
+    volumes:
+      # We are injecting our own config (prometheus.yml) into the container.
+      # Without this, Prometheus would run with its default config, and not scrape your llm-app.
+      # If we edit prometheus.yml locally, changes will be reflected inside the container (after restart).
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    depends_on:
+      - llm-app
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - '3001:3000'
+    depends_on:
+      - prometheus

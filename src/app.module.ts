@@ -5,12 +5,14 @@ import { HealthModule } from './health/health.module';
 import { LogsModule } from './logs/logs.module';
 import { ConfigModule } from '@nestjs/config';
 import { PineconeModule } from './shared/pinecone';
+import { MonitoringModule } from './shared/monitoring/monitoring.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot(), // Load environment variables from .env file
     HealthModule,
     PineconeModule,
+    MonitoringModule,
     LogsModule,
   ],
   controllers: [AppController],
